@@ -4,27 +4,19 @@ using System.Collections.Generic;
 
 public class PlayerCursor : MonoBehaviour {
 
-    private Vector2 cursorPosition;
-    private Vector2 lastCursorPosition;
+    private Vector2 cursorPosition2D;
+    private Vector2 lastCursorPosition2D;
     private MapController map;
     private bool cursorOnPlayerFlag;
 	private LevelManager level;
 	public static Vector2 overlapBoxSize; //used to determine if cursor is overlapping with another object
-	public static string mvrngDisplayed;
-	public static string playerSelected;
-	public static string enemyHP;
-	public static string enemyName;
 
     // Use this for initialization
     void Start () {
-        cursorPosition = transform.position;
-        lastCursorPosition = transform.position;
+        cursorPosition2D = transform.position;
+        lastCursorPosition2D = transform.position;
         overlapBoxSize = new Vector2(0.5f, 0.5f);
         cursorOnPlayerFlag = false;
-        mvrngDisplayed = "None";
-        playerSelected = "None";
-        enemyName = "None";
-        enemyHP = "None";
 		level = FindObjectOfType<LevelManager>();
 		map = FindObjectOfType<MapController>();
     }
@@ -34,125 +26,147 @@ public class PlayerCursor : MonoBehaviour {
 
     }
 
+	public void MoveIfTileInRange(Vector3 moveDir, string spriteTag) {
+		Vector2 moveDir2D = moveDir;
+		if (Physics2D.OverlapBox(cursorPosition2D + moveDir2D, overlapBoxSize, 0))
+		{
+			// check if the tile to the right is within the movement range
+			if (map.TileIsInRange(cursorPosition2D + moveDir2D, spriteTag))
+			{
+				transform.Translate(moveDir);
+				cursorPosition2D = transform.position;
+				if (CursorIsOnEnemy()) 
+				{
+					DisplayEnemyInfo(level.getEnemyIdAtPosition(transform.position));
+				} 
+				else 
+				{
+					HideEnemyInfo();
+				}
+			}
+		}
+	}
+
     public void TryMoveCursor(Vector2 moveDir)
     {
 		if (level.getPlayerSelectedFlag()) {
+			string spriteTag = "";
+			if (level.getPlayerAttackRangeDisplayed()) {
+				spriteTag = "AttackRange";
+			} 
+			else {
+				spriteTag = "MoveRange";	
+			}
 			if (Input.GetKeyDown(KeyCode.RightArrow))
 			{
-				if (Physics2D.OverlapBox(cursorPosition + Vector2.right, overlapBoxSize, 0))
-				{
-					// check if the tile to the right is within the movement range
-					if (map.TileIsInMoveRange(cursorPosition + Vector2.right))
-					{
-						transform.Translate(Vector3.right);
-						cursorPosition = transform.position;
-					}
-				}
+				MoveIfTileInRange(Vector3.right, spriteTag);
 			}
 			if (Input.GetKeyDown(KeyCode.LeftArrow))
 			{
-				if (Physics2D.OverlapBox(cursorPosition + Vector2.left, overlapBoxSize, 0))
-				{
-					if (map.TileIsInMoveRange(cursorPosition + Vector2.left))
-					{
-						transform.Translate(Vector3.left);
-						cursorPosition = transform.position;
-					}
-				}
+				MoveIfTileInRange(Vector3.left, spriteTag);
 			}
 			if (Input.GetKeyDown(KeyCode.UpArrow))
 			{
-				if (Physics2D.OverlapBox(cursorPosition + Vector2.up, overlapBoxSize, 0))
-				{
-					if (map.TileIsInMoveRange(cursorPosition + Vector2.up))
-					{
-						transform.Translate(Vector3.up);
-						cursorPosition = transform.position;
-					}
-				}
+				MoveIfTileInRange(Vector3.up, spriteTag);
 			}
 			if (Input.GetKeyDown(KeyCode.DownArrow))
 			{
-				if (Physics2D.OverlapBox(cursorPosition + Vector2.down, overlapBoxSize, 0))
-				{
-					if (map.TileIsInMoveRange(cursorPosition + Vector2.down))
-					{
-						transform.Translate(Vector3.down);
-						cursorPosition = transform.position;
-					}
-				}
+				MoveIfTileInRange(Vector3.down, spriteTag);
 			}			
 		}
-        else if (Physics2D.OverlapBox(cursorPosition + moveDir, overlapBoxSize, 0))
+        else if (Physics2D.OverlapBox(cursorPosition2D + moveDir, overlapBoxSize, 0))
         {
-            lastCursorPosition = transform.position;
+            lastCursorPosition2D = transform.position;
             transform.Translate(moveDir);
-            cursorPosition = transform.position;
+            cursorPosition2D = transform.position;
             //Debug.Log("Last cursor position: (" + lastCursorPosition.x + ", " + lastCursorPosition.y + ")");
-            Debug.Log("New cursor position: (" + cursorPosition.x + ", " + cursorPosition.y + ")");
-            bool foundPlayer = false;
-            int foundPlayerID = -1;
-            string foundPlayerName = "";
+            Debug.Log("New cursor position: (" + cursorPosition2D.x + ", " + cursorPosition2D.y + ")");
             // check to see if cursor is hovering over a player 
-            foreach (PlayerController player in level.players)
-            {
-                if (player.transform.position == transform.position)
-                {
-					player.setCursorIsOnPlayer(true);
-                    foundPlayer = true;
-					foundPlayerID = player.getPlayerId();
-                    foundPlayerName = player.playerName;
-                }
-                else
-                {
-					player.setCursorIsOnPlayer(false);
-                }
-            }
-            if (foundPlayer)
-            {
-				if (!level.players[foundPlayerID].getPlayerMoved())
-                {
-                    DisplayPlayerMoveRange(foundPlayerID);
-                    mvrngDisplayed = foundPlayerName;
-                    cursorOnPlayerFlag = true;
-                    //Debug.Log("Cursor on player? " + cursorOnPlayerFlag);
-                }
-                else
-                {
-                    Debug.Log("Player has already moved. Displaying Attack range");
-                    DisplayAttackRange();
-                }
-            }
-            else
-            {
-				if (!level.getPlayerSelectedFlag())
-                {
-                    map.HideMovementRange();
-                    mvrngDisplayed = "None";
-                }
-                cursorOnPlayerFlag = false;
-                //Debug.Log("Cursor on player? " + cursorOnPlayerFlag);
-            }
-            // check to see if cursor is hovering over an enemy
-            if (!foundPlayer)
-            {
-				foreach (EnemyController enemy in level.enemies) {
-					if (enemy.transform.position == transform.position)
-					{
-						enemyHP = enemy.enemyHP.ToString();
-						enemyName = enemy.enemyName;
-						DisplayEnemyMoveRange(enemy.getEnemyId());
-					}
-					else
-					{
-						enemyHP = "None";
-						enemyName = "None";
-						map.HideMovementRange();
-					}
+			if (CursorIsOnPlayer()) {
+				level.players[level.getPlayerIdAtPosition(transform.position)].setCursorIsOnPlayer(true);
+				level.SetCursorIsOnPlayerToFalseExcept(level.getPlayerIdAtPosition(transform.position));
+				if (!level.players[level.getPlayerIdAtPosition(transform.position)].getPlayerMoved())
+				{
+					DisplayPlayerMoveRange(level.getPlayerIdAtPosition(transform.position));
+					CanvasManager.mvrngDisplayed = level.getPlayerNameAtPosition(transform.position);
+					cursorOnPlayerFlag = true;
+					//Debug.Log("Cursor on player? " + cursorOnPlayerFlag);
 				}
-            }
+				else
+				{
+					Debug.Log("Player has already moved. Displaying Attack range");
+					DisplayAttackRange();
+				}
+				DisplayPlayerInfo(level.getPlayerIdAtPosition(transform.position));
+			} 
+			else {
+				level.SetCursorIsOnPlayerToFalseAllPlayers();
+				if (!level.getPlayerSelectedFlag())
+				{
+					map.HideMovementRange();
+					CanvasManager.mvrngDisplayed = "None";
+				}
+				cursorOnPlayerFlag = false;
+				HidePlayerInfo();
+				//Debug.Log("Cursor on player? " + cursorOnPlayerFlag);
+				if (CursorIsOnEnemy())
+				{
+					DisplayEnemyInfo(level.getEnemyIdAtPosition(transform.position));
+				}
+				else
+				{
+					HideEnemyInfo();
+				}
+			}
         }
     }
+
+	public void HidePlayerInfo() {
+		CanvasManager.playerHP = "None";
+		CanvasManager.playerName = "None";
+	}
+
+	public void DisplayPlayerInfo(int playerId) {
+		CanvasManager.playerHP = level.players[playerId].playerHP.ToString();
+		CanvasManager.playerName = level.players[playerId].playerName;
+	}
+
+	public bool CursorIsOnPlayer() {
+		foreach (PlayerController player in level.players)
+		{
+			if (player.transform.position == transform.position)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	public void DisplayEnemyInfo(int enemyId) {
+		CanvasManager.enemyHP = level.enemies[enemyId].enemyHP.ToString();
+		CanvasManager.enemyName = level.enemies[enemyId].enemyName;
+		if (!level.getPlayerAttackRangeDisplayed()) {
+			DisplayEnemyMoveRange(enemyId);
+		}
+	}
+
+	public void HideEnemyInfo() {
+		CanvasManager.enemyHP = "None";
+		CanvasManager.enemyName = "None";
+		if (!level.getPlayerSelectedFlag()) {
+			map.HideMovementRange();		
+		}
+	}
+
+	public bool CursorIsOnEnemy() {
+		foreach (EnemyController enemy in level.enemies) {
+			if (enemy.transform.position == transform.position) {
+				return true;
+			}
+		}
+		return false;
+	}
 
     public void DisplayPlayerMoveRange(int playerId)
     {
@@ -192,7 +206,7 @@ public class PlayerCursor : MonoBehaviour {
             else
             {
 				player.setPlayerSelected(true);
-                playerSelected = player.playerName;
+				CanvasManager.playerSelected = player.playerName;
             }
         }
 		level.setPlayerSelectedFlag(true);
@@ -205,9 +219,10 @@ public class PlayerCursor : MonoBehaviour {
 			player.setPlayerSelected(false);
         }
 		level.setPlayerSelectedFlag(false);
+		level.setPlayerAttackRangeDisplayed(false);
         map.HideMovementRange();
-        playerSelected = "None";
-        mvrngDisplayed = "None";
+		CanvasManager.playerSelected = "None";
+		CanvasManager.mvrngDisplayed = "None";
         Debug.Log("Player unselected");
     }
 
@@ -244,10 +259,12 @@ public class PlayerCursor : MonoBehaviour {
     public void DisplayAttackRange()
     {
         map.HideMovementRange();
-        map.DisplayAttackRange(cursorPosition + Vector2.up);
-        map.DisplayAttackRange(cursorPosition + Vector2.right);
-        map.DisplayAttackRange(cursorPosition + Vector2.down);
-        map.DisplayAttackRange(cursorPosition + Vector2.left);
+        map.DisplayAttackRange(cursorPosition2D + Vector2.up);
+        map.DisplayAttackRange(cursorPosition2D + Vector2.right);
+        map.DisplayAttackRange(cursorPosition2D + Vector2.down);
+        map.DisplayAttackRange(cursorPosition2D + Vector2.left);
+		map.DisplayAttackRange(cursorPosition2D);
+		level.setPlayerAttackRangeDisplayed(true);
     }
 
 	public void TrySelectPlayer() {

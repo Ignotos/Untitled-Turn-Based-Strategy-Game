@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // This class keeps track of all player moves using a stack. This makes it possible to undo previous moves. 
-public class PlayerMovesStack : MonoBehaviour
+public class PlayerMovesStack 
 {
 	private Stack<int> movedPlayerIds;
 	private Stack<Vector3> positionsMovedFrom;
@@ -12,7 +12,7 @@ public class PlayerMovesStack : MonoBehaviour
 	public PlayerMovesStack() {
 		movedPlayerIds = new Stack<int>();
 		positionsMovedFrom = new Stack<Vector3>();
-		level = FindObjectOfType<LevelManager>();
+		level = MonoBehaviour.FindObjectOfType<LevelManager>();
 	}
 
 	public void Push(int movedPlayerId, Vector3 positionMovedFrom) {

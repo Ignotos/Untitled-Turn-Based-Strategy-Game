@@ -5,11 +5,13 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     public int moveRange;
+	public string playerName;
+	public int playerHP;
     private bool playerMoved;
     private bool playerSelected;
     private int playerId;
     private bool playerMoveRangeDisplayed;
-    public string playerName;
+	private bool playerAttackRangeDisplayed;
     private bool cursorIsOnPlayer;
 	private static int playerIds = 0;
 
@@ -53,6 +55,14 @@ public class PlayerController : MonoBehaviour {
 
 	public bool getPlayerMoveRangeDisplayed() {
 		return playerMoveRangeDisplayed;
+	}
+
+	public void setPlayerAttackRangeDisplayed(bool flag) {
+		playerAttackRangeDisplayed = flag;
+	}
+
+	public bool getPlayerAttackRangeDisplayed() {
+		return playerAttackRangeDisplayed;
 	}
 
 	public void setCursorIsOnPlayer(bool flag) {

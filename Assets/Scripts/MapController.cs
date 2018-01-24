@@ -104,7 +104,22 @@ public class MapController : MonoBehaviour {
                 //Debug.Log("Grass tile position: (" + grassTilePosition2D.x + ", " + grassTilePosition2D.y + ")"); 
                 ////Debug.Log("Grass Tile Position: " + grassTilePosition2D.x + ", " + grassTilePosition2D.y);
                 ////Debug.Log("Player Position: " + playerPosition2D.x + ", " + playerPosition2D.y);
-
+				if (playerPosition2D == grassTilePosition2D) {
+					foreach (Transform movementRangeSprite in child)
+					{
+						if (movementRangeSprite.tag == "MoveRange")
+						{
+							//movementRangeSprite.Translate(new Vector3(0, 0, -10));
+							movementRangeSprite.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+							//Debug.Log("Found Movement Range Sprite. Enabled?: " + movementRangeSprite.gameObject.GetComponent<SpriteRenderer>().enabled);
+							////Debug.Log("MovementRangeSprite z-axis position: " + movementRangeSprite.transform.position.z);
+						}
+						else
+						{
+							//Debug.Log("In else branch. Movement Range Sprite tag: " + movementRangeSprite.tag);
+						}
+					}
+				}
                 while (mvrng > 0)
                 {
                     if ((playerPosition2D + new Vector2(mvrng, 0)) == grassTilePosition2D)
@@ -231,6 +246,7 @@ public class MapController : MonoBehaviour {
         }
     }
 
+	// disable the movement range sprite for all tiles 
     public void HideMovementRange()
     {
         foreach (Transform child in transform)
@@ -268,7 +284,8 @@ public class MapController : MonoBehaviour {
         }
     }
 
-    public bool TileIsInMoveRange(Vector2 tilePosition)
+	// checks if a given tile is in the currently displayed movement range
+	public bool TileIsInRange(Vector2 tilePosition, string spriteTag)
     {
         Vector2 grassTilePosition2D = new Vector2();
         foreach (Transform child in transform)
@@ -278,7 +295,7 @@ public class MapController : MonoBehaviour {
             {
                 foreach (Transform moveRangeSprite in child)
                 {
-                    if (moveRangeSprite.tag == "MoveRange")
+					if (moveRangeSprite.tag == spriteTag)
                     {
                         if (moveRangeSprite.gameObject.GetComponent<SpriteRenderer>().enabled)
                         {
@@ -291,6 +308,7 @@ public class MapController : MonoBehaviour {
         return false;
     }
 
+	// checks if a tile exists at the given position
     public bool TileExistsAt(Vector2 tilePosition)
     {
         Vector2 grassTilePosition2D = new Vector2();

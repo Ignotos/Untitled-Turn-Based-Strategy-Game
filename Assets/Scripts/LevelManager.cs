@@ -7,6 +7,7 @@ public class LevelManager : MonoBehaviour
 	private PlayerCursor cursor;
 	public PlayerController[] players;
 	private bool playerSelectedFlag;
+	private bool playerAttackRangeDisplayed;
 	public EnemyController[] enemies;
 	public PlayerMovesStack stack;
 
@@ -28,7 +29,6 @@ public class LevelManager : MonoBehaviour
 				cursor.UnselectAllPlayers();
 			}
 			if (Input.GetKeyDown(KeyCode.Space)) {
-				//Debug.Log("Move player to this tile.");
 				MoveSelectedPlayer();
 			}
 		}
@@ -79,6 +79,57 @@ public class LevelManager : MonoBehaviour
 
 	public bool getPlayerSelectedFlag() {
 		return playerSelectedFlag;
+	}
+
+	public void setPlayerAttackRangeDisplayed(bool flag) {
+		playerAttackRangeDisplayed = flag;
+	}
+
+	public bool getPlayerAttackRangeDisplayed() {
+		return playerAttackRangeDisplayed;
+	}
+
+	public int getEnemyIdAtPosition(Vector3 pos) {
+		foreach (EnemyController enemy in enemies) {
+			if (enemy.transform.position == pos) {
+				return enemy.getEnemyId();
+			}
+		}
+		return -1;
+	}
+
+	public int getPlayerIdAtPosition(Vector3 pos) {
+		foreach (PlayerController player in players) {
+			if (player.transform.position == pos) {
+				return player.getPlayerId();
+			}
+		}
+		return -1;		
+	}
+
+	public string getPlayerNameAtPosition(Vector3 pos) {
+		foreach (PlayerController player in players) {
+			if (player.transform.position == pos) {
+				return player.playerName;
+			}
+		}
+		return "";			
+	}
+
+	// sets cursorIsOnPlayer flag to false for all players except the given player id 
+	public void SetCursorIsOnPlayerToFalseExcept(int playerId) {
+		foreach (PlayerController player in players) {
+			if (player.getPlayerId() != playerId) {
+				player.setCursorIsOnPlayer(false);
+			}
+		}
+	}
+
+	//sets cursorIsOnPlayer flag to false for all players
+	public void SetCursorIsOnPlayerToFalseAllPlayers() {
+		foreach (PlayerController player in players) {
+			player.setCursorIsOnPlayer(false);
+		}
 	}
 }
 
