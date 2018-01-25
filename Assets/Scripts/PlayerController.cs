@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
 	public string playerName;
 	public int playerHP;
     private bool playerMoved;
+	private bool playerAttacked;
     private bool playerSelected;
     private int playerId;
     private bool playerMoveRangeDisplayed;
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour {
 	void Start () {
         playerMoved = false;
         playerSelected = false;
+		playerAttacked = false;
         playerMoveRangeDisplayed = false;
         cursorIsOnPlayer = false;
 		playerId = playerIds++;
@@ -43,6 +45,14 @@ public class PlayerController : MonoBehaviour {
 
 	public bool getPlayerSelected() {
 		return playerSelected;
+	}
+
+	public void setPlayerAttacked(bool flag) {
+		playerAttacked = flag;
+	}
+
+	public bool getPlayerAttacked() {
+		return playerAttacked;
 	}
 
 	public int getPlayerId() {

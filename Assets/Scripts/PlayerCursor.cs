@@ -38,6 +38,7 @@ public class PlayerCursor : MonoBehaviour {
 				if (CursorIsOnEnemy()) 
 				{
 					DisplayEnemyInfo(level.getEnemyIdAtPosition(transform.position));
+					Debug.Log("Cursor is on enemy. Press space to attack!");
 				} 
 				else 
 				{
@@ -72,7 +73,7 @@ public class PlayerCursor : MonoBehaviour {
 			if (Input.GetKeyDown(KeyCode.DownArrow))
 			{
 				MoveIfTileInRange(Vector3.down, spriteTag);
-			}			
+			}		
 		}
         else if (Physics2D.OverlapBox(cursorPosition2D + moveDir, overlapBoxSize, 0))
         {
@@ -94,8 +95,10 @@ public class PlayerCursor : MonoBehaviour {
 				}
 				else
 				{
-					Debug.Log("Player has already moved. Displaying Attack range");
-					DisplayAttackRange();
+					if (!level.players[level.getPlayerIdAtPosition(transform.position)].getPlayerAttacked()) {
+						Debug.Log("Player has already moved. Displaying Attack range");
+						DisplayAttackRange();
+					}
 				}
 				DisplayPlayerInfo(level.getPlayerIdAtPosition(transform.position));
 			} 
@@ -162,9 +165,11 @@ public class PlayerCursor : MonoBehaviour {
 	public bool CursorIsOnEnemy() {
 		foreach (EnemyController enemy in level.enemies) {
 			if (enemy.transform.position == transform.position) {
+				level.setCursorIsOnEnemy(true);
 				return true;
 			}
 		}
+		level.setCursorIsOnEnemy(false);
 		return false;
 	}
 
@@ -284,5 +289,9 @@ public class PlayerCursor : MonoBehaviour {
 
 	public void setCursorOnPlayerFlag(bool flag) {
 		cursorOnPlayerFlag = flag;
+	}
+
+	public void HideMovementRange() {
+		map.HideMovementRange();
 	}
 }

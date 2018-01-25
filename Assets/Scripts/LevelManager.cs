@@ -10,6 +10,7 @@ public class LevelManager : MonoBehaviour
 	private bool playerAttackRangeDisplayed;
 	public EnemyController[] enemies;
 	public PlayerMovesStack stack;
+	private bool cursorIsOnEnemy;
 
 	// Use this for initialization
 	void Start () {
@@ -28,8 +29,10 @@ public class LevelManager : MonoBehaviour
 			if (Input.GetKeyDown(KeyCode.Escape)) {
 				cursor.UnselectAllPlayers();
 			}
-			if (Input.GetKeyDown(KeyCode.Space)) {
-				MoveSelectedPlayer();
+			if (!playerAttackRangeDisplayed) {
+				if (Input.GetKeyDown(KeyCode.Space)) {
+					MoveSelectedPlayer();
+				}
 			}
 		}
 		if (Input.GetKeyDown(KeyCode.RightArrow)) {
@@ -49,6 +52,20 @@ public class LevelManager : MonoBehaviour
 		}
 		if (Input.GetKeyDown(KeyCode.Z)) {
 			stack.Pop();
+		}
+		if (cursorIsOnEnemy && playerAttackRangeDisplayed)
+		{
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				Debug.Log("Enemy attacked! -1HP to enemy");
+				AttackEnemy();
+				players[getSelectedPlayerId()].setPlayerAttacked(true);
+				cursor.UnselectAllPlayers();
+				cursor.HideMovementRange();
+				playerAttackRangeDisplayed = false;
+				playerSelectedFlag = false;
+
+			}		
 		}
 		// pressing the D key prints some debug information to the console.
 		if (Input.GetKeyDown(KeyCode.D)) {
@@ -89,6 +106,14 @@ public class LevelManager : MonoBehaviour
 		return playerAttackRangeDisplayed;
 	}
 
+	public bool getCursorIsOnEnemy() {
+		return cursorIsOnEnemy;
+	}
+
+	public void setCursorIsOnEnemy(bool flag) {
+		cursorIsOnEnemy = flag;
+	}
+
 	public int getEnemyIdAtPosition(Vector3 pos) {
 		foreach (EnemyController enemy in enemies) {
 			if (enemy.transform.position == pos) {
@@ -114,6 +139,11 @@ public class LevelManager : MonoBehaviour
 			}
 		}
 		return "";			
+	}
+
+	public void AttackEnemy() {
+		enemies[getEnemyIdAtPosition(cursor.transform.position)].enemyHP--;
+		CanvasManager.enemyHP = enemies[getEnemyIdAtPosition(cursor.transform.position)].enemyHP.ToString();
 	}
 
 	// sets cursorIsOnPlayer flag to false for all players except the given player id 
