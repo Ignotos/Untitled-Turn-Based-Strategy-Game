@@ -50,7 +50,7 @@ public class PlayerCursor : MonoBehaviour {
 
     public void TryMoveCursor(Vector2 moveDir)
     {
-		if (level.getPlayerSelectedFlag()) {
+		if (level.isPlayerSelected()) {
 			string spriteTag = "";
 			if (level.getPlayerAttackRangeDisplayed()) {
 				spriteTag = "AttackRange";
@@ -104,7 +104,7 @@ public class PlayerCursor : MonoBehaviour {
 			} 
 			else {
 				level.SetCursorIsOnPlayerToFalseAllPlayers();
-				if (!level.getPlayerSelectedFlag())
+				if (!level.isPlayerSelected())
 				{
 					map.HideMovementRange();
 					CanvasManager.mvrngDisplayed = "None";
@@ -157,7 +157,7 @@ public class PlayerCursor : MonoBehaviour {
 	public void HideEnemyInfo() {
 		CanvasManager.enemyHP = "None";
 		CanvasManager.enemyName = "None";
-		if (!level.getPlayerSelectedFlag()) {
+		if (!level.isPlayerSelected()) {
 			map.HideMovementRange();		
 		}
 	}
@@ -214,7 +214,6 @@ public class PlayerCursor : MonoBehaviour {
 				CanvasManager.playerSelected = player.playerName;
             }
         }
-		level.setPlayerSelectedFlag(true);
     }
 
     public void UnselectAllPlayers()
@@ -223,7 +222,6 @@ public class PlayerCursor : MonoBehaviour {
         {
 			player.setPlayerSelected(false);
         }
-		level.setPlayerSelectedFlag(false);
 		level.setPlayerAttackRangeDisplayed(false);
         map.HideMovementRange();
 		CanvasManager.playerSelected = "None";

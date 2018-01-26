@@ -24,4 +24,16 @@ public class EnemyController : MonoBehaviour {
 	public int getEnemyId() {
 		return enemyId;
 	}
+
+    public void DoEnemyTurn()
+    {
+        // find closest player to this enemy (player pos - enemy position)
+
+        // find direction to move in (TBD) 
+
+        // move in that direction
+
+        // if there is a player adjacent to the enemy, attack them
+
+    }
 }

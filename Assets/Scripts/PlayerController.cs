@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour {
     private bool playerMoveRangeDisplayed;
 	private bool playerAttackRangeDisplayed;
     private bool cursorIsOnPlayer;
-	private static int playerIds = 0;
+    private bool endPlayerTurn;
+    private static int playerIds = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -24,12 +25,23 @@ public class PlayerController : MonoBehaviour {
         playerMoveRangeDisplayed = false;
         cursorIsOnPlayer = false;
 		playerId = playerIds++;
+        endPlayerTurn = false;
     }
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    public bool getEndPlayerTurn()
+    {
+        return endPlayerTurn;
+    }
+
+    public void setEndPlayerTurn(bool flag)
+    {
+        endPlayerTurn = true;
+    }
 
 	public void setPlayerMoved(bool flag) {
 		playerMoved = flag;
