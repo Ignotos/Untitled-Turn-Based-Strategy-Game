@@ -10,10 +10,12 @@ public class EnemyController : MonoBehaviour {
     public int enemyAttackRange;
 	private int enemyId;  
 	private static int enemyIds = 0;
+	private LevelManager level;
 
 	// Use this for initialization
 	void Start () {
 		enemyId = enemyIds++;
+		level = FindObjectOfType<LevelManager>();
 	}
 	
 	// Update is called once per frame

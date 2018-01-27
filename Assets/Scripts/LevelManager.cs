@@ -6,10 +6,10 @@ public class LevelManager : MonoBehaviour
 {
 	private PlayerCursor cursor;
 	public PlayerController[] players;
-	private bool playerAttackRangeDisplayed;
 	public EnemyController[] enemies;
 	public PlayerMovesStack stack;
 	private bool cursorIsOnEnemy;
+	private MapController map;
 
 	// Use this for initialization
 	void Start () {
@@ -19,6 +19,7 @@ public class LevelManager : MonoBehaviour
 		Debug.Log("Number of enemies: " + enemies.Length);
 		cursor = FindObjectOfType<PlayerCursor>();
 		stack = new PlayerMovesStack();
+		map = FindObjectOfType<MapController>();
 	}
 
 	// Update is called once per frame
@@ -35,11 +36,13 @@ public class LevelManager : MonoBehaviour
                 {
                     players[getSelectedPlayerId()].setEndPlayerTurn(true);
                     cursor.HideMovementRange();
+					players[getSelectedPlayerId()].setPlayerAttackRangeDisplayed(false);
                     players[getSelectedPlayerId()].setPlayerSelected(false);
                     Debug.Log("Ended player turn.");
                     CanvasManager.playerSelected = "None";
+					cursor.UnselectAllPlayers();
                 }
-                if (!playerAttackRangeDisplayed)
+				if (!getPlayerAttackRangeDisplayed())
                 {
                     if (Input.GetKeyDown(KeyCode.Space))
                     {
@@ -71,7 +74,7 @@ public class LevelManager : MonoBehaviour
             {
                 stack.Pop();
             }
-            if (cursorIsOnEnemy && playerAttackRangeDisplayed)
+			if (cursorIsOnEnemy && getPlayerAttackRangeDisplayed())
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
@@ -79,9 +82,9 @@ public class LevelManager : MonoBehaviour
                     AttackEnemy();
                     players[getSelectedPlayerId()].setPlayerAttacked(true);
                     players[getSelectedPlayerId()].setEndPlayerTurn(true);
+					players[getSelectedPlayerId()].setPlayerAttackRangeDisplayed(false);
                     cursor.UnselectAllPlayers();
                     cursor.HideMovementRange();
-                    playerAttackRangeDisplayed = false;
                 }
             }
             // pressing the D key prints some debug information to the console.
@@ -123,12 +126,13 @@ public class LevelManager : MonoBehaviour
 		cursor.MoveSelectedPlayer();
 	}
 
-	public void setPlayerAttackRangeDisplayed(bool flag) {
-		playerAttackRangeDisplayed = flag;
-	}
-
 	public bool getPlayerAttackRangeDisplayed() {
-		return playerAttackRangeDisplayed;
+		foreach (PlayerController player in players) {
+			if (player.getPlayerAttackRangeDisplayed()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public bool getCursorIsOnEnemy() {
@@ -209,6 +213,10 @@ public class LevelManager : MonoBehaviour
 		foreach (PlayerController player in players) {
 			player.setCursorIsOnPlayer(false);
 		}
+	}
+
+	public MapController getMap() {
+		return map;
 	}
 }
 
