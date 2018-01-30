@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour {
 
     public void setEndPlayerTurn(bool flag)
     {
-        endPlayerTurn = true;
+		endPlayerTurn = flag;
     }
 
 	public void setPlayerMoved(bool flag) {

@@ -10,6 +10,7 @@ public class LevelManager : MonoBehaviour
 	public PlayerMovesStack stack;
 	private bool cursorIsOnEnemy;
 	private MapController map;
+	private bool enemyPhaseStarted;
 
 	// Use this for initialization
 	void Start () {
@@ -20,12 +21,14 @@ public class LevelManager : MonoBehaviour
 		cursor = FindObjectOfType<PlayerCursor>();
 		stack = new PlayerMovesStack();
 		map = FindObjectOfType<MapController>();
+		enemyPhaseStarted = false;
 	}
 
 	// Update is called once per frame
 	void Update () {
         if (!allPlayersTurnEnded())
         {
+			//Debug.Log ("I'm here");
             if (isPlayerSelected())
             {
                 if (Input.GetKeyDown(KeyCode.Escape))
@@ -52,6 +55,7 @@ public class LevelManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
+				//Debug.Log ("I'm here");
                 cursor.TryMoveCursor(Vector2.right);
             }
             if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -99,8 +103,18 @@ public class LevelManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("All player have ended their turn. Enemy phase.");
-            DoEnemyPhase();
+			if (!enemyPhaseStarted) {
+				Debug.Log ("All player have ended their turn. Enemy phase.");
+				DoEnemyPhase ();	
+				Debug.Log ("Enemy phase over.");
+				enemyPhaseStarted = true;
+			} 
+			else {
+				if (allPlayersTurnEnded ()) {
+					enemyPhaseStarted = false;
+				}
+			}
+			//Debug.Log ("I'm here. All players turn ended? " + allPlayersTurnEnded());
         }
 	}
 
@@ -110,6 +124,15 @@ public class LevelManager : MonoBehaviour
         {
             enemy.DoEnemyTurn();
         }
+		foreach (PlayerController player in players) {
+			//Debug.Log("Setting all players bools to false.");
+			player.setPlayerMoved(false);
+			player.setPlayerSelected(false);
+			player.setPlayerAttacked(false);
+			player.setPlayerMoveRangeDisplayed(false);
+			player.setCursorIsOnPlayer(false);
+			player.setEndPlayerTurn(false);
+		}
     }
 
 	public int getSelectedPlayerId() {

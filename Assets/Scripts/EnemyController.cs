@@ -29,13 +29,54 @@ public class EnemyController : MonoBehaviour {
 
     public void DoEnemyTurn()
     {
-        // find closest player to this enemy (player pos - enemy position)
-
-        // find direction to move in (TBD) 
-
-        // move in that direction
+		//move enemy toward the closest player
+		MoveEnemy(GetClosestPlayer());
 
         // if there is a player adjacent to the enemy, attack them
-
+		// to do
     }
+
+	public int GetClosestPlayer() {
+		int closestPlayerId = 0;
+		float currentMinDistance = 0.0f;
+		foreach (PlayerController player in level.players) {
+			Vector2 enemyPos2D = transform.position;
+			Vector2 playerPos2D = player.transform.position;
+			float distance = Vector2.Distance(enemyPos2D, playerPos2D);
+			if (currentMinDistance > distance || currentMinDistance <= 0.0f) {
+				currentMinDistance = distance;
+				closestPlayerId = player.getPlayerId();
+			}
+		}
+		Debug.Log ("Min distance is " + currentMinDistance + " from Player " + closestPlayerId);
+		return closestPlayerId;
+	}
+
+	public void MoveEnemy(int targetPlayerId) {
+		Vector2 enemyPos2D = transform.position;
+		Vector2 playerPos2D = level.players[targetPlayerId].transform.position;
+
+		//Vector2 directionTowardPlayer = (enemyPos2D - playerPos2D).normalized;
+		Vector2 directionTowardPlayer = playerPos2D - enemyPos2D;
+		Debug.Log("Direction toward player: (" + directionTowardPlayer.x + "," + directionTowardPlayer.y + ")");
+
+		if (Mathf.Abs(directionTowardPlayer.x) > Mathf.Abs(directionTowardPlayer.y)) {
+			// greater x distance, move along x 
+			if (directionTowardPlayer.x > 0) {
+				transform.Translate(Vector3.right);
+			} 
+			else {
+				transform.Translate(Vector3.left);
+			}
+		}
+		else {
+			// greater y distance, move along y 
+			if (directionTowardPlayer.y > 0) {
+				transform.Translate(Vector3.up);
+			} 
+			else {
+				transform.Translate(Vector3.down);
+			}
+		}
+	}
 }
